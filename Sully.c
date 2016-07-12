@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define S2 "#include <stdio.h>%c#include <stdlib.h>%c#define S2 %c%s%c%c#define S1 %c%s%c%c#define %s%c/*%c Call main by macro%c*/%cFT()%c"
-#define S1 "FT()int main(){char a='%cn',b='%c',c='%c%c';\\%cint i = %i;\\%cchar *str=NULL;char *in=NULL;while(i > -1){asprintf(&str,S1,c,b,c,c,i,b,b,b,b);asprintf(&in, %cSully_%i.c%c, i);FILE *f=fopen(in, %cw%c);fprintf(f,S2,a,b,S2,b,a,b,S1,b,a,str,a,a,a,a,a);fclose(f);free(str);i--};return 0;}"
-#define FT()int main(){char a='\n',b='"',c='\\';\
+#define S2 "#include <stdio.h>%c#include <stdlib.h>%c#define S2 %c%s%c%c#define S1 %c%s%c%cint foo(char *s){while((*s < '0' || *s > '9') && *s != 0)s++;return *s == 0 ? -1 : atoi(s);}%c#define %s%cFT()%c"
+#define S1 "FT()int main(int ac, char**av){char a='%cn',b='%c',c='%c%c';%c%cint i = %i;%c%cif(ac>1 && foo(av[0])>0)i--;char *str=NULL;char *in=NULL;asprintf(&str,S1,c,b,c,c,c,a,i,c,a,b,b,b,b);asprintf(&in, %cSully_%%i.c%c, i);FILE *f=fopen(in, %cw%c);if (f==NULL)return -1;fprintf(f,S2,a,a,b,S2,b,a,b,S1,b,a,a,str,a,a);fclose(f);free(str);free(in);return 0;}"
+int foo(char *s){while((*s < '0' || *s > '9') && *s != 0)s++;return *s == 0 ? -1 : atoi(s);}
+#define FT()int main(int ac, char**av){char a='\n',b='"',c='\\';\
 int i = 5;\
-char *str=NULL;char *in=NULL;while(i > -1){asprintf(&str,S1,c,b,c,c,a,i,a,b,b,b,i,b);asprintf(&in, "Sully_%i.c", i);FILE *f=fopen(in, "w");if (f==NULL)return -1;fprintf(f,S2,a,a,b,S2,b,a,b,S1,b,a,str,a,a,a,a,a);fclose(f);free(str);free(in);i--;}return 0;}
-/*
- Call main by macro
-*/
+if(foo(av[0])>0)i--;char *str=NULL;char *in=NULL;asprintf(&str,S1,c,b,c,c,c,a,i,c,a,b,b,b,b);asprintf(&in, "Sully_%i.c", i);FILE *f=fopen(in, "w");if (f==NULL)return -1;fprintf(f,S2,a,a,b,S2,b,a,b,S1,b,a,a,str,a,a);fclose(f);free(str);free(in);char *cmd=NULL;asprintf(&cmd, "clang -Wall -Wextra -Werror Sully_%i.c -o Sully_%i && ./Sully_%i",i,i,i);system(cmd);free(cmd);return 0;}
 FT()
